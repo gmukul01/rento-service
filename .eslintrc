@@ -11,7 +11,7 @@
     },
     "parserOptions": {
         "ecmaVersion": 11,
-        "project": "./tsconfig.eslint.json"
+        "project": "./tsconfig.json"
     },
     "parser": "@typescript-eslint/parser",
     "plugins": ["@typescript-eslint", "jest", "prettier"],
