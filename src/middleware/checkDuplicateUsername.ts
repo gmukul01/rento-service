@@ -7,8 +7,5 @@ export const checkDuplicateUsername: RequestHandler = (req, res, next) =>
             username: req.body.username
         })
         .exec()
-        .then(() => {
-            res.status(400).send({ variant: 'error', message: 'Failed! Username is already in use!' });
-            next();
-        })
+        .then(user => (user ? res.status(400).send({ variant: 'error', message: 'Failed! Username is already in use!' }) : next()))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));

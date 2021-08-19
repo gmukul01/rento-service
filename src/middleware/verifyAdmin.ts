@@ -15,9 +15,9 @@ export const verifyAdmin: RequestHandler = (req, res, next) =>
                 _id: { $in: user.roles }
             })
         )
-        .then(roles => {
+        .then(roles =>
             roles.find((role: { name: string }) => role.name === 'admin')
                 ? next()
-                : res.status(403).send({ variant: 'error', message: 'Require Admin Role!' });
-        })
+                : res.status(403).send({ variant: 'error', message: 'Require Admin Role!' })
+        )
         .catch(err => res.status(500).send({ variant: 'error', message: err }));

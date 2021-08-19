@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { getAllBookings, rentBike } from '../controllers/booking.controller';
+import { getAllBookings, rentBike } from '../controllers/bookings.controller';
 import { addHeaders, verifyToken } from '../middleware';
 
 const router = Router();

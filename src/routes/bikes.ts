@@ -1,5 +1,5 @@
 import { Router } from 'express';
-import { createBike, deleteBike, getAllBikes, rateBike, updateBike } from '../controllers/bike.controller';
+import { createBike, deleteBike, getAllBikes, rateBike, updateBike } from '../controllers/bikes.controller';
 import { addHeaders, verifyAdmin, verifyToken } from '../middleware';
 
 const router = Router();

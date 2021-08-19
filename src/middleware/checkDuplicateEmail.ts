@@ -7,8 +7,5 @@ export const checkDuplicateEmail: RequestHandler = (req, res, next) =>
             email: req.body.email
         })
         .exec()
-        .then(() => {
-            res.status(400).send({ variant: 'error', message: 'Failed! Email is already in use!' });
-            next();
-        })
+        .then(user => (user ? res.status(400).send({ variant: 'error', message: 'Failed! Email is already in use!' }) : next()))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));

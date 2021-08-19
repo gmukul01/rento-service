@@ -1,9 +1,9 @@
 import { Router } from 'express';
 import auth from './auth';
-import bike from './bike';
-import booking from './booking';
+import bike from './bikes';
+import booking from './bookings';
 import { healthCheck } from './healthCheck';
-import user from './user';
+import user from './users';
 
 const router = Router();
 
