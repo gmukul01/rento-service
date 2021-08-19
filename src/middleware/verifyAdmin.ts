@@ -16,10 +16,9 @@ export const verifyAdmin: RequestHandler = (req, res, next) => {
             // @ts-ignore
             (err, roles) => {
                 err && res.status(500).send({ variant: 'error', message: err });
-
-                roles.find((role: { name: string }) => role.name === 'admin') && next();
-
-                res.status(403).send({ variant: 'error', message: 'Require Admin Role!' });
+                roles.find((role: { name: string }) => role.name === 'admin')
+                    ? next()
+                    : res.status(403).send({ variant: 'error', message: 'Require Admin Role!' });
             }
         );
     });
