@@ -3,24 +3,30 @@ import { db } from '../models/index';
 
 const Bike = db.bike;
 
-export const createBike: RequestHandler = (req, res) => {
-    const bike = new Bike(req.body);
+export const createBike: RequestHandler = (req, res) =>
+    new Bike({ ...req.body, ratings: {} })
+        .save()
+        .then(() => res.send({ variant: 'success', message: 'Bike was registered successfully!' }))
+        .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
-    bike.save((err, bike) => {
-        err && res.status(500).send({ variant: 'error', message: err });
-        bike && res.send({ variant: 'success', message: 'Bike was registered successfully!' });
-    });
-};
+export const updateBike: RequestHandler = (req, res) =>
+    Bike.updateOne({ _id: req.params.bikeId }, req.body, { strict: true, upsert: true })
+        .then(() => res.send({ variant: 'success', message: 'Bike was updated successfully!' }))
+        .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
-export const rateBike: RequestHandler = (req, res) => {
-    // @ts-ignore
-    Bike.findOne({ _id: req.params.bikeId }, (err, bike) => {
-        err && res.status(500).send({ variant: 'error', message: err });
-        // @ts-ignore
-        bike.ratings.set(req.userId, req.query.rating);
-        bike.save((err: unknown) => {
-            err && res.status(500).send({ variant: 'error', message: err });
-            res.send({ variant: 'success', message: 'Rating was registered successfully!' });
-        });
-    });
-};
+export const deleteBike: RequestHandler = (req, res) =>
+    Bike.deleteOne({ _id: req.params.bikeId })
+        .then(() => res.send({ variant: 'success', message: 'Bike was deleted successfully!' }))
+        .catch(err => res.status(500).send({ variant: 'error', message: err }));
+
+export const rateBike: RequestHandler = (req, res) =>
+    Bike.findOne({ _id: req.params.bikeId })
+        .then(bike => {
+            // @ts-ignore
+            bike.ratings.set(req.userId, req.query.rating);
+            return bike
+                .save()
+                .then(() => res.send({ variant: 'success', message: 'Rating was registered successfully!' }))
+                .catch(err => res.status(500).send({ variant: 'error', message: err }));
+        })
+        .catch(err => res.status(500).send({ variant: 'error', message: err }));

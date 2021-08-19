@@ -6,5 +6,6 @@
         "source.organizeImports": true,
         "source.fixAll.stylelint": true
     },
-    "eslint.validate": ["javascript", "typescript", "markdown"]
+    "eslint.validate": ["javascript", "typescript", "markdown"],
+    "cSpell.words": ["upsert"]
 }
