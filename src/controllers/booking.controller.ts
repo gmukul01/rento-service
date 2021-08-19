@@ -4,8 +4,14 @@ import { db } from '../models/index';
 const Booking = db.booking;
 
 export const rentBike: RequestHandler = (req, res) =>
-    // @ts-ignore
-    new Booking({ ...req.body, userId: req.userId })
+    new Booking({
+        isCancelled: false,
+        // @ts-ignore
+        userId: req.userId,
+        ...req.body,
+        startTime: new Date(req.body.startTime),
+        endTime: new Date(req.body.endTime)
+    })
         .save()
         .then(() => res.send({ variant: 'success', message: 'Booking was registered successfully!' }))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
