@@ -44,6 +44,13 @@ export const getPastBookings: RequestHandler = (req, res) =>
         .then(bookings => res.status(200).send(bookings))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
+export const getAllUserBookings: RequestHandler = (req, res) =>
+    // @ts-ignore
+    Booking.find({ userId: req.params.userId })
+        .then(attachBikeInfo)
+        .then(bookings => res.status(200).send(bookings))
+        .catch(err => res.status(500).send({ variant: 'error', message: err }));
+
 export const getUpcomingBookings: RequestHandler = (req, res) =>
     // @ts-ignore
     Booking.find({ userId: req.userId, startTime: { $gte: new Date().getTime() } })
