@@ -16,15 +16,16 @@ export const updateBike: RequestHandler = (req, res) =>
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
 export const getAllBikes: RequestHandler = (req, res) => {
-    const { startDate, startTime, endDate, endTime, ratings = [1, 2, 3, 4, 5], ...restQuery } = req.query;
+    const { startDate, startTime, endDate, endTime, ratings = [0, 1, 2, 3, 4, 5], ...restQuery } = req.query;
 
     const startTimeQuery = startDate && startTime && new Date(`${startDate} ${startTime}`),
-        endTimeQuery = endDate && endTime && new Date(`${endDate} ${endTime}`);
+        endTimeQuery = endDate && endTime && new Date(`${endDate} ${endTime}`),
+        isTimeQueryPresent = startTimeQuery || endTimeQuery;
 
     // @ts-ignore
     return Bike.find({ ...restQuery, rating: { $in: ratings } })
-        .then(bikes => {
-            return Promise.all(
+        .then(bikes =>
+            Promise.all(
                 bikes.map(async bike => ({
                     ...bike.toJSON(),
                     id: bike.id,
@@ -33,10 +34,10 @@ export const getAllBikes: RequestHandler = (req, res) => {
                         bikeId: bike._id,
                         ...(startTimeQuery ? { endTime: { $gt: startTimeQuery } } : {}),
                         ...(endTimeQuery ? { startTime: { $lt: endTimeQuery } } : {})
-                    }).then(bookings => (startTimeQuery || endTimeQuery ? !bookings.length : !!bookings.length))
+                    }).then(bookings => (isTimeQueryPresent ? !bookings.length : true))
                 }))
-            );
-        })
+            )
+        )
         .then(bikes => res.status(200).send(bikes))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 };

@@ -6,7 +6,7 @@ import { db } from '../models/index';
 const Booking = db.booking,
     Bike = db.bike;
 
-export const rentBike: RequestHandler = (req, res) => {
+export const createBooking: RequestHandler = (req, res) => {
     const { startDate, startTime, endDate, endTime, ...restBody } = req.body,
         calculatedStartTime = new Date(`${startDate} ${startTime}`),
         calculatedEndTime = new Date(`${endDate} ${endTime}`);

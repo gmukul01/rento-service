@@ -1,8 +1,15 @@
 import mongoose from 'mongoose';
 
-type User = { username: string; email: string; firstName: string; lastName: string; password: string; roles: { name: string }[] };
+export type UserType = {
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    password: string;
+    roles: { name: string }[];
+};
 
-export const User = mongoose.model<User>(
+export const User = mongoose.model<UserType>(
     'User',
     new mongoose.Schema({
         username: String,

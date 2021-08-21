@@ -1,12 +1,12 @@
 import { Router } from 'express';
-import { adminBoard, allAccess, userBoard } from '../controllers';
+import { deleteUser, getAllUsers, updateUser } from '../controllers';
 import { addHeaders, verifyAdmin, verifyToken } from '../middleware';
 
 const router = Router();
 
 router.use(addHeaders);
-router.get('/all', allAccess);
-router.get('/user', [verifyToken], userBoard);
-router.get('/admin', [verifyToken, verifyAdmin], adminBoard);
+router.get('/', [verifyToken, verifyAdmin], getAllUsers);
+router.put('/', [verifyToken, verifyAdmin], updateUser);
+router.post('/:bookingId', [verifyToken, verifyAdmin], deleteUser);
 
 export default router;

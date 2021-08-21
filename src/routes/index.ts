@@ -11,6 +11,6 @@ router.get('/healthCheck', healthCheck);
 router.use('/auth', auth);
 router.use('/bikes', bike);
 router.use('/bookings', booking);
-router.use('/test', user);
+router.use('/users', user);
 
 export default router;
