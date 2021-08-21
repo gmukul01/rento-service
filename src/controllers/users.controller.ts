@@ -7,7 +7,7 @@ import { attachRoles, getRoleNames } from './auth.controller';
 
 const User = db.user;
 
-const attachRoleNames = (users: EnforceDocument<UserType, unknown>[]) =>
+const attachInfo = (users: EnforceDocument<UserType, unknown>[]) =>
     users.map(user => ({
         ...user.toJSON(),
         password: undefined,
@@ -15,11 +15,14 @@ const attachRoleNames = (users: EnforceDocument<UserType, unknown>[]) =>
         roles: user.roles.map((role: { name: string }) => role.name)
     }));
 
-export const getAllUsers: RequestHandler = (_, res) =>
-    User.find()
-        .populate('roles', '-__v')
+export const getAllUsers: RequestHandler = (req, res) =>
+    User.find({
+        ...(typeof req.query.hasBookings === 'boolean' ? { $where: `this.bookings.length ${req.query.hasBookings ? '> 1' : '= 0'}` } : {})
+    })
+        .populate('roles')
+        .populate('bookings')
         .exec()
-        .then(attachRoleNames)
+        .then(attachInfo)
         .then(users => res.status(200).send(users))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 

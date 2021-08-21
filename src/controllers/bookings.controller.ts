@@ -4,59 +4,87 @@ import { EnforceDocument } from 'mongoose';
 import { db } from '../models/index';
 
 const Booking = db.booking,
-    Bike = db.bike;
+    User = db.user;
 
 export const createBooking: RequestHandler = (req, res) => {
-    const { startDate, startTime, endDate, endTime, ...restBody } = req.body,
+    const { startDate, startTime, endDate, endTime, bikeId, ...restBody } = req.body,
         calculatedStartTime = new Date(`${startDate} ${startTime}`),
         calculatedEndTime = new Date(`${endDate} ${endTime}`);
 
     return new Booking({
         isCancelled: false,
-        // @ts-ignore
-        userId: req.userId,
         ...restBody,
+        // @ts-ignore
+        user: req.userId,
+        bike: bikeId,
         startTime: calculatedStartTime,
         endTime: calculatedEndTime
     })
         .save()
+        .then(booking =>
+            User.findOne({
+                // @ts-ignore
+                _id: req.userId
+            }).then(user => {
+                user.bookings.push(booking.id);
+                return user.save();
+            })
+        )
         .then(() => res.send({ variant: 'success', message: 'Booking is done successfully!' }))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 };
 
-const attachBikeInfo = (bookings: EnforceDocument<BookingType, unknown>[]) =>
-    Promise.all(
-        bookings.map(booking =>
-            Bike.findOne({ _id: booking.bikeId }).then(bike => ({ ...bike.toJSON(), ...booking.toJSON(), id: booking.id }))
-        )
-    );
+const attachInfo = (bookings: EnforceDocument<BookingType, unknown>[]) =>
+    bookings.map(booking => {
+        const bookingJson = booking.toJSON();
+        return { ...bookingJson.bike, ...bookingJson.user, ...bookingJson, id: booking.id };
+    });
 
 export const getAllBookings: RequestHandler = (req, res) =>
     Booking.find(req.query)
-        .then(attachBikeInfo)
+        .populate('Bike')
+        .populate('User')
+        .exec()
+        .then(attachInfo)
         .then(bookings => res.send(bookings))
-        .catch(err => res.status(500).send({ variant: 'error', message: err }));
-
-export const getPastBookings: RequestHandler = (req, res) =>
-    // @ts-ignore
-    Booking.find({ userId: req.userId, endTime: { $lte: new Date().getTime() } })
-        .then(attachBikeInfo)
-        .then(bookings => res.status(200).send(bookings))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
 export const getAllUserBookings: RequestHandler = (req, res) =>
     // @ts-ignore
-    Booking.find({ userId: req.params.userId })
-        .then(attachBikeInfo)
+    Booking.find({ user: req.params.userId })
+        .populate('Bike')
+        .populate('User')
+        .exec()
+        .then(attachInfo)
+        .then(bookings => res.status(200).send(bookings))
+        .catch(err => res.status(500).send({ variant: 'error', message: err }));
+
+export const getPastBookings: RequestHandler = (req, res) =>
+    // @ts-ignore
+    Booking.find({ user: req.userId, endTime: { $lte: new Date().getTime() } })
+        .populate('Bike')
+        .populate('User')
+        .exec()
+        .then(attachInfo)
         .then(bookings => res.status(200).send(bookings))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
 export const getUpcomingBookings: RequestHandler = (req, res) =>
     // @ts-ignore
-    Booking.find({ userId: req.userId, startTime: { $gte: new Date().getTime() } })
-        .then(attachBikeInfo)
+    Booking.find({ user: req.userId, startTime: { $gte: new Date().getTime() } })
+        .populate('bike')
+        .populate('user')
+        .exec()
+        .then(attachInfo)
         .then(bookings => res.status(200).send(bookings))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
+
+const removeBookingFromUser = (booking: EnforceDocument<BookingType, unknown>) =>
+    User.findOne({ _id: booking.user }).then(user => {
+        // @ts-ignore
+        user.bookings.pull(booking.id);
+        return user.save();
+    });
 
 export const updateBooking: RequestHandler = (req, res) =>
     Booking.updateOne({ _id: req.params.bookingId }, req.body, { strict: true, upsert: true })
@@ -64,6 +92,7 @@ export const updateBooking: RequestHandler = (req, res) =>
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
 export const deleteBooking: RequestHandler = (req, res) =>
-    Booking.deleteOne({ _id: req.params.bookingId })
+    Booking.findOne({ _id: req.params.bookingId })
+        .then(booking => booking.deleteOne().then(() => removeBookingFromUser(booking)))
         .then(() => res.send({ variant: 'success', message: 'Booking is deleted successfully!' }))
         .catch(err => res.status(500).send({ variant: 'error', message: err }));

@@ -36,7 +36,8 @@ export const signUp: RequestHandler = (req, res) =>
         email: req.body.email,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        password: bcrypt.hashSync(req.body.password, 8)
+        password: bcrypt.hashSync(req.body.password, 8),
+        bookings: []
     })
         .save()
         .then(user => attachRoles(user, req.body.roles))

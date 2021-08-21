@@ -7,6 +7,7 @@ export type UserType = {
     lastName: string;
     password: string;
     roles: { name: string }[];
+    bookings: string[];
 };
 
 export const User = mongoose.model<UserType>(
@@ -21,6 +22,12 @@ export const User = mongoose.model<UserType>(
             {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Role'
+            }
+        ],
+        bookings: [
+            {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'Booking'
             }
         ]
     })
