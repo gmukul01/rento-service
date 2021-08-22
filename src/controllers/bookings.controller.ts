@@ -42,8 +42,8 @@ const attachInfo = (bookings: EnforceDocument<BookingType, unknown>[]) =>
 
 export const getAllBookings: RequestHandler = (req, res) =>
     Booking.find(req.query)
-        .populate('Bike')
-        .populate('User')
+        .populate('bike')
+        .populate('user')
         .exec()
         .then(attachInfo)
         .then(bookings => res.send(bookings))
@@ -52,8 +52,8 @@ export const getAllBookings: RequestHandler = (req, res) =>
 export const getAllUserBookings: RequestHandler = (req, res) =>
     // @ts-ignore
     Booking.find({ user: req.params.userId })
-        .populate('Bike')
-        .populate('User')
+        .populate('bike')
+        .populate('user')
         .exec()
         .then(attachInfo)
         .then(bookings => res.status(200).send(bookings))
@@ -61,9 +61,9 @@ export const getAllUserBookings: RequestHandler = (req, res) =>
 
 export const getPastBookings: RequestHandler = (req, res) =>
     // @ts-ignore
-    Booking.find({ user: req.userId, endTime: { $lte: new Date().getTime() } })
-        .populate('Bike')
-        .populate('User')
+    Booking.find({ user: req.userId, startTime: { $lte: new Date().getTime() } })
+        .populate('bike')
+        .populate('user')
         .exec()
         .then(attachInfo)
         .then(bookings => res.status(200).send(bookings))
