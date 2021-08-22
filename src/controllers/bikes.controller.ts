@@ -59,3 +59,15 @@ export const rateBike: RequestHandler = (req, res) =>
                 .catch(err => res.status(500).send({ variant: 'error', message: err }));
         })
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
+
+export const getAllModels: RequestHandler = (req, res) =>
+    Bike.find()
+        .select('model -_id')
+        .then(models => res.status(200).send(models.map(({ model }) => model)))
+        .catch(err => res.status(500).send({ variant: 'error', message: err }));
+
+export const getAllColors: RequestHandler = (req, res) =>
+    Bike.find()
+        .select('color -_id')
+        .then(colors => res.status(200).send(colors.map(({ color }) => color)))
+        .catch(err => res.status(500).send({ variant: 'error', message: err }));
