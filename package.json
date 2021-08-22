@@ -12,7 +12,7 @@
         "postinstall": "yarn run dist",
         "predist": "rimraf dist",
         "dist": "tsc",
-        "start": "node .",
+        "start": "node -r dotenv/config .",
         "test": "jest",
         "dev": "nodemon ."
     },
