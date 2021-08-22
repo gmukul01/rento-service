@@ -2,7 +2,6 @@ import bodyParser from 'body-parser';
 import cors from 'cors';
 import express from 'express';
 import morgan from 'morgan';
-import { dbConfig } from './config/db.config';
 import { db } from './models';
 import routes from './routes';
 
@@ -20,7 +19,7 @@ app.use(morgan('combined'));
 /** Connect to mongodb */
 const Role = db.role;
 db.mongoose
-    .connect(`mongodb://${dbConfig.HOST}:${dbConfig.PORT}/${dbConfig.DB}`, {
+    .connect(process.env.MONGODB_URI, {
         useNewUrlParser: true,
         useUnifiedTopology: true
     })
