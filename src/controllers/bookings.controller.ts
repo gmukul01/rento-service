@@ -37,7 +37,7 @@ export const createBooking: RequestHandler = (req, res) => {
 const attachInfo = (bookings: EnforceDocument<BookingType, unknown>[]) =>
     bookings.map(booking => {
         const bookingJson = booking.toJSON();
-        return { ...bookingJson.bike, ...bookingJson.user, ...bookingJson, id: booking.id };
+        return { ...bookingJson.bike, ...bookingJson.user, ...bookingJson, password: undefined, id: booking.id };
     });
 
 export const getAllBookings: RequestHandler = (req, res) =>
