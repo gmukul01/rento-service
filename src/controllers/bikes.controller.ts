@@ -16,14 +16,20 @@ export const updateBike: RequestHandler = (req, res) =>
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
 export const getAllBikes: RequestHandler = (req, res) => {
-    const { startDate, startTime, endDate, endTime, ratings = [0, 1, 2, 3, 4, 5], ...restQuery } = req.query;
+    const { startDate, startTime, endDate, endTime, ratings, models, colors, ...restQuery } = req.query,
+        query = {
+            ...restQuery,
+            ...(ratings ? { rating: { $in: (ratings as string).split(',') } } : {}),
+            ...(models ? { model: { $in: (models as string).split(',') } } : {}),
+            ...(colors ? { color: { $in: (colors as string).split(',') } } : {})
+        };
 
     const startTimeQuery = startDate && startTime && new Date(`${startDate} ${startTime}`),
         endTimeQuery = endDate && endTime && new Date(`${endDate} ${endTime}`),
         isTimeQueryPresent = startTimeQuery || endTimeQuery;
 
     // @ts-ignore
-    return Bike.find({ ...restQuery, rating: { $in: ratings } })
+    return Bike.find({ ...query })
         .then(bikes =>
             Promise.all(
                 bikes.map(async bike => ({
