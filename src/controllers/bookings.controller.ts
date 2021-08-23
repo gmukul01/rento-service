@@ -7,9 +7,9 @@ const Booking = db.booking,
     User = db.user;
 
 export const createBooking: RequestHandler = (req, res) => {
-    const { startDate, startTime, endDate, endTime, bikeId, ...restBody } = req.body,
-        calculatedStartTime = new Date(`${startDate} ${startTime}`),
-        calculatedEndTime = new Date(`${endDate} ${endTime}`);
+    const { startTime, endTime, bikeId, ...restBody } = req.body,
+        calculatedStartTime = new Date(startTime),
+        calculatedEndTime = new Date(endTime);
 
     return new Booking({
         isCanceled: false,
@@ -63,7 +63,7 @@ export const getPastBookings: RequestHandler = (req, res) =>
     // @ts-ignore
     Booking.find({ user: req.userId })
         // @ts-ignore
-        .or([{ startTime: { $lte: new Date().getTime() } }, { isCanceled: true }])
+        .or([{ startTime: { $lte: new Date() } }, { isCanceled: true }])
         .populate('bike')
         .populate('user')
         .exec()
@@ -73,7 +73,7 @@ export const getPastBookings: RequestHandler = (req, res) =>
 
 export const getUpcomingBookings: RequestHandler = (req, res) =>
     // @ts-ignore
-    Booking.find({ user: req.userId, startTime: { $gte: new Date().getTime() }, isCanceled: false })
+    Booking.find({ user: req.userId, startTime: { $gte: new Date() }, isCanceled: false })
         .populate('bike')
         .populate('user')
         .exec()

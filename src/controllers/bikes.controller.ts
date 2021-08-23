@@ -16,7 +16,7 @@ export const updateBike: RequestHandler = (req, res) =>
         .catch(err => res.status(500).send({ variant: 'error', message: err }));
 
 export const getAllBikes: RequestHandler = (req, res) => {
-    const { startDate, startTime, endDate, endTime, ratings, models, colors, ...restQuery } = req.query,
+    const { startTime, endTime, ratings, models, colors, ...restQuery } = req.query,
         query = {
             ...restQuery,
             ...(ratings ? { rating: { $in: (ratings as string).split(',') } } : {}),
@@ -24,8 +24,8 @@ export const getAllBikes: RequestHandler = (req, res) => {
             ...(colors ? { color: { $in: (colors as string).split(',') } } : {})
         };
 
-    const startTimeQuery = startDate && startTime && new Date(`${startDate} ${startTime}`),
-        endTimeQuery = endDate && endTime && new Date(`${endDate} ${endTime}`),
+    const startTimeQuery = startTime && new Date(startTime as string),
+        endTimeQuery = endTime && new Date(endTime as string),
         isTimeQueryPresent = startTimeQuery || endTimeQuery;
 
     // @ts-ignore
