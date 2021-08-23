@@ -36,7 +36,7 @@ export const getAllBikes: RequestHandler = (req, res) => {
                     ...bike.toJSON(),
                     id: bike.id,
                     isAvailable: await Booking.find({
-                        isCancelled: false,
+                        isCanceled: false,
                         bike: bike._id,
                         ...(startTimeQuery ? { endTime: { $gt: startTimeQuery } } : {}),
                         ...(endTimeQuery ? { startTime: { $lt: endTimeQuery } } : {})

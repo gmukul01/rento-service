@@ -17,7 +17,7 @@ const attachInfo = (users: EnforceDocument<UserType, unknown>[]) =>
 
 export const getAllUsers: RequestHandler = (req, res) =>
     User.find({
-        ...(typeof req.query.hasBookings === 'boolean' ? { $where: `this.bookings.length ${req.query.hasBookings ? '> 1' : '= 0'}` } : {})
+        ...(Object.prototype.hasOwnProperty.call(req.query, 'hasBookings') ? { 'bookings.0': { $exists: req.query.hasBookings } } : {})
     })
         .populate('roles')
         .populate('bookings')
@@ -32,7 +32,8 @@ export const createUser: RequestHandler = (req, res) =>
         email: req.body.email,
         firstName: req.body.firstName,
         lastName: req.body.lastName,
-        password: bcrypt.hashSync(req.body.password, 8)
+        password: bcrypt.hashSync(req.body.password, 8),
+        bookings: []
     })
         .save()
         .then(user => attachRoles(user, req.body.roles))

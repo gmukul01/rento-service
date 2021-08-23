@@ -5,7 +5,7 @@ export type BookingType = {
     user: Record<string, unknown>;
     startTime: Date;
     endTime: Date;
-    isCancelled: boolean;
+    isCanceled: boolean;
 };
 
 export const Booking = mongoose.model<BookingType>(
@@ -13,7 +13,7 @@ export const Booking = mongoose.model<BookingType>(
     new mongoose.Schema({
         startTime: Date,
         endTime: Date,
-        isCancelled: Boolean,
+        isCanceled: Boolean,
         bike: {
             type: mongoose.Schema.Types.ObjectId,
             ref: 'Bike'
